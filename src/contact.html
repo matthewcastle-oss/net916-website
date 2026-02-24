@@ -1,21 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Fun2Phish - About Us</title>
+  <title>Fun2Phish - Contact</title>
 </head>
 <body>
-  <h1>About Fun2Phish</h1>
+  <h1>Contact Fun2Phish</h1>
 
   <nav>
     <a href="index.html">Home</a> |
     <a href="employees.html">Employees</a> |
+    <a href="about.html">About Us</a> |
     <a href="contact.html">Contact</a> |
     <a href="/intranet/">Employee Intranet</a>
   </nav>
 
-  <p>
-    Fun2Phish is a student-run IT team focused on building secure, reliable systems.
-    This site includes a public-facing website and a secure employee intranet.
-  </p>
+  <h2>Inquiries</h2>
+
+  <form id="inquiryForm">
+    <label>First Name: <input name="firstName" required></label><br><br>
+    <label>Last Name: <input name="lastName" required></label><br><br>
+    <label>Email: <input name="email" type="email" required></label><br><br>
+    <label>Phone: <input name="phone"></label><br><br>
+    <label>Message Subject: <input name="subject" required></label><br><br>
+    <label>Message Body:<br>
+      <textarea name="body" rows="6" cols="50" required></textarea>
+    </label><br><br>
+
+    <button type="submit">Submit Inquiry</button>
+  </form>
+
+  <p id="status"></p>
+
+  <script>
+    const form = document.getElementById('inquiryForm');
+    const statusEl = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.textContent = "Submitting...";
+
+      const data = Object.fromEntries(new FormData(form).entries());
+
+      const res = await fetch('/api/inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const text = await res.text();
+      statusEl.textContent = res.ok ? "Submitted! HR has been notified." : ("Error: " + text);
+      if (res.ok) form.reset();
+    });
+  </script>
 </body>
 </html>
