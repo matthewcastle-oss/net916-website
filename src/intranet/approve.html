@@ -1,14 +1,70 @@
 <!DOCTYPE html>
 <html>
-<head><title>Approve/Deny Requests</title></head>
+<head>
+  <title>Approve/Deny Time Off</title>
+</head>
 <body>
-  <h1>Approve/Deny Requests (HR)</h1>
+  <h1>Approve/Deny Time Off Requests (HR)</h1>
 
   <nav>
     <a href="/intranet/index.html">Intranet Home</a> |
     <a href="/">Public Site</a>
   </nav>
 
-  <p>Approval page goes here.</p>
+  <p>Enter a Request ID to approve or deny.</p>
+
+  <form id="decisionForm">
+    <label>Request ID:
+      <input name="requestId" type="number" required>
+    </label>
+    <br><br>
+
+    <label>Status:
+      <select name="status" required>
+        <option value="Approved">Approved</option>
+        <option value="Denied">Denied</option>
+      </select>
+    </label>
+    <br><br>
+
+    <label>Manager Note (optional):<br>
+      <textarea name="managerNote" rows="4" cols="50"></textarea>
+    </label>
+    <br><br>
+
+    <button type="submit">Submit Decision</button>
+  </form>
+
+  <p id="status"></p>
+
+  <script>
+    const form = document.getElementById('decisionForm');
+    const statusEl = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.textContent = "Submitting...";
+
+      const data = Object.fromEntries(new FormData(form).entries());
+      data.requestId = parseInt(data.requestId, 10);
+
+      try {
+        const res = await fetch('/api/timeoff/decision', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const text = await res.text();
+        statusEl.textContent = res.ok ? text : "Error: " + text;
+
+        if (res.ok) {
+          form.reset();
+        }
+      } catch (err) {
+        statusEl.textContent = "Error: Could not submit decision.";
+      }
+    });
+  </script>
 </body>
 </html>
