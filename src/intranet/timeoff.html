@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head><title>Time Off Request</title></head>
+<head>
+  <title>Time Off Request</title>
+</head>
 <body>
   <h1>Time Off Request</h1>
 
@@ -9,6 +11,59 @@
     <a href="/">Public Site</a>
   </nav>
 
-  <p>Time off form goes here.</p>
+  <form id="timeoffForm">
+    <label>Your Email:
+      <input name="employeeEmail" type="email" required>
+    </label>
+    <br><br>
+
+    <label>Start Date:
+      <input name="startDate" type="date" required>
+    </label>
+    <br><br>
+
+    <label>End Date:
+      <input name="endDate" type="date" required>
+    </label>
+    <br><br>
+
+    <label>Reason:<br>
+      <textarea name="reason" rows="5" cols="50" required></textarea>
+    </label>
+    <br><br>
+
+    <button type="submit">Submit Request</button>
+  </form>
+
+  <p id="status"></p>
+
+  <script>
+    const form = document.getElementById('timeoffForm');
+    const statusEl = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.textContent = "Submitting...";
+
+      const data = Object.fromEntries(new FormData(form).entries());
+
+      try {
+        const res = await fetch('/api/timeoff/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const text = await res.text();
+        statusEl.textContent = res.ok ? text : "Error: " + text;
+
+        if (res.ok) {
+          form.reset();
+        }
+      } catch (err) {
+        statusEl.textContent = "Error: Could not submit request.";
+      }
+    });
+  </script>
 </body>
 </html>
