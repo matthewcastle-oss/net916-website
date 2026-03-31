@@ -1,69 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Time Off Request</title>
+  <meta charset="UTF-8">
+  <title>Time Off</title>
+  <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-  <h1>Time Off Request</h1>
 
-  <nav>
-    <a href="/intranet/index.html">Intranet Home</a> |
-    <a href="/">Public Site</a>
-  </nav>
+<div class="container">
 
-  <form id="timeoffForm">
-    <label>Your Email:
-      <input name="employeeEmail" type="email" required>
-    </label>
-    <br><br>
+<h1>Time Off Request</h1>
 
-    <label>Start Date:
-      <input name="startDate" type="date" required>
-    </label>
-    <br><br>
+<nav>
+  <a href="/intranet/index.html">Intranet Home</a>
+  <a href="/">Public Site</a>
+</nav>
 
-    <label>End Date:
-      <input name="endDate" type="date" required>
-    </label>
-    <br><br>
+<hr>
 
-    <label>Reason:<br>
-      <textarea name="reason" rows="5" cols="50" required></textarea>
-    </label>
-    <br><br>
+<form id="timeoffForm">
 
-    <button type="submit">Submit Request</button>
-  </form>
+<label>Email</label>
+<input name="employeeEmail" type="email" required>
 
-  <p id="status"></p>
+<label>Start Date</label>
+<input name="startDate" type="date" required>
 
-  <script>
-    const form = document.getElementById('timeoffForm');
-    const statusEl = document.getElementById('status');
+<label>End Date</label>
+<input name="endDate" type="date" required>
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      statusEl.textContent = "Submitting...";
+<label>Reason</label>
+<textarea name="reason" required></textarea>
 
-      const data = Object.fromEntries(new FormData(form).entries());
+<button type="submit">Submit</button>
 
-      try {
-        const res = await fetch('/api/timeoff/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
+</form>
 
-        const text = await res.text();
-        statusEl.textContent = res.ok ? text : "Error: " + text;
+<p id="status"></p>
 
-        if (res.ok) {
-          form.reset();
-        }
-      } catch (err) {
-        statusEl.textContent = "Error: Could not submit request.";
-      }
-    });
-  </script>
+<script>
+document.getElementById("timeoffForm").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const data = Object.fromEntries(new FormData(e.target));
+
+  const res = await fetch("/api/timeoff/submit", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(data)
+  });
+
+  document.getElementById("status").innerText = await res.text();
+});
+</script>
+
+</div>
+
 </body>
 </html>
