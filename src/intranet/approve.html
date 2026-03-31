@@ -1,70 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Approve/Deny Time Off</title>
+  <meta charset="UTF-8">
+  <title>Approve Requests</title>
+  <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-  <h1>Approve/Deny Time Off Requests (HR)</h1>
 
-  <nav>
-    <a href="/intranet/index.html">Intranet Home</a> |
-    <a href="/">Public Site</a>
-  </nav>
+<div class="container">
 
-  <p>Enter a Request ID to approve or deny.</p>
+<h1>Approve Requests</h1>
 
-  <form id="decisionForm">
-    <label>Request ID:
-      <input name="requestId" type="number" required>
-    </label>
-    <br><br>
+<nav>
+  <a href="/intranet/index.html">Intranet Home</a>
+  <a href="/">Public Site</a>
+</nav>
 
-    <label>Status:
-      <select name="status" required>
-        <option value="Approved">Approved</option>
-        <option value="Denied">Denied</option>
-      </select>
-    </label>
-    <br><br>
+<hr>
 
-    <label>Manager Note (optional):<br>
-      <textarea name="managerNote" rows="4" cols="50"></textarea>
-    </label>
-    <br><br>
+<form id="decisionForm">
 
-    <button type="submit">Submit Decision</button>
-  </form>
+<label>Request ID</label>
+<input name="requestId" type="number" required>
 
-  <p id="status"></p>
+<label>Status</label>
+<select name="status">
+  <option>Approved</option>
+  <option>Denied</option>
+</select>
 
-  <script>
-    const form = document.getElementById('decisionForm');
-    const statusEl = document.getElementById('status');
+<label>Note</label>
+<textarea name="managerNote"></textarea>
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      statusEl.textContent = "Submitting...";
+<button type="submit">Submit</button>
 
-      const data = Object.fromEntries(new FormData(form).entries());
-      data.requestId = parseInt(data.requestId, 10);
+</form>
 
-      try {
-        const res = await fetch('/api/timeoff/decision', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
+<p id="status"></p>
 
-        const text = await res.text();
-        statusEl.textContent = res.ok ? text : "Error: " + text;
+<script>
+document.getElementById("decisionForm").addEventListener("submit", async e => {
+  e.preventDefault();
 
-        if (res.ok) {
-          form.reset();
-        }
-      } catch (err) {
-        statusEl.textContent = "Error: Could not submit decision.";
-      }
-    });
-  </script>
+  const data = Object.fromEntries(new FormData(e.target));
+
+  const res = await fetch("/api/timeoff/decision", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(data)
+  });
+
+  document.getElementById("status").innerText = await res.text();
+});
+</script>
+
+</div>
+
 </body>
 </html>
