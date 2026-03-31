@@ -1,56 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Fun2Phish - Contact</title>
+  <meta charset="UTF-8">
+  <title>Contact</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Contact Fun2Phish</h1>
 
-  <nav>
-    <a href="index.html">Home</a> |
-    <a href="employees.html">Employees</a> |
-    <a href="about.html">About Us</a> |
-    <a href="contact.html">Contact</a> |
-    <a href="/intranet/">Employee Intranet</a>
-  </nav>
+<div class="container">
 
-  <h2>Inquiries</h2>
+<h1>Contact</h1>
 
-  <form id="inquiryForm">
-    <label>First Name: <input name="firstName" required></label><br><br>
-    <label>Last Name: <input name="lastName" required></label><br><br>
-    <label>Email: <input name="email" type="email" required></label><br><br>
-    <label>Phone: <input name="phone"></label><br><br>
-    <label>Message Subject: <input name="subject" required></label><br><br>
-    <label>Message Body:<br>
-      <textarea name="body" rows="6" cols="50" required></textarea>
-    </label><br><br>
+<nav>
+  <a href="index.html">Home</a>
+  <a href="employees.html">Employees</a>
+  <a href="about.html">About</a>
+  <a href="/intranet/index.html">Employee Intranet</a>
+</nav>
 
-    <button type="submit">Submit Inquiry</button>
-  </form>
+<hr>
 
-  <p id="status"></p>
+<form>
+  <label>Name</label>
+  <input type="text">
 
-  <script>
-    const form = document.getElementById('inquiryForm');
-    const statusEl = document.getElementById('status');
+  <label>Email</label>
+  <input type="email">
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      statusEl.textContent = "Submitting...";
+  <label>Message</label>
+  <textarea></textarea>
 
-      const data = Object.fromEntries(new FormData(form).entries());
+  <button type="submit">Send</button>
+</form>
 
-      const res = await fetch('/api/inquiry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+</div>
 
-      const text = await res.text();
-      statusEl.textContent = res.ok ? "Submitted! HR has been notified." : ("Error: " + text);
-      if (res.ok) form.reset();
-    });
-  </script>
 </body>
 </html>
