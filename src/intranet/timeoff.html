@@ -1,60 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Time Off</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Off Request — Fun2Phish</title>
   <link rel="stylesheet" href="../style.css">
+  <style>
+    .logout-btn {
+      background: transparent;
+      border: 1px solid rgba(244,63,94,0.3);
+      color: #f43f5e;
+      font-size: 0.8rem;
+      padding: 0.4rem 1rem;
+      box-shadow: none;
+    }
+    .logout-btn:hover {
+      background: rgba(244,63,94,0.1);
+      box-shadow: none;
+      transform: none;
+    }
+    .status-ok {
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.3);
+      color: #10b981;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      margin-top: 1rem;
+      display: none;
+    }
+    .status-err {
+      background: rgba(244,63,94,0.1);
+      border: 1px solid rgba(244,63,94,0.3);
+      color: #f43f5e;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      margin-top: 1rem;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-
-<div class="container">
-
-<h1>Time Off Request</h1>
+<script src="/intranet/auth.js"></script>
 
 <nav>
-  <a href="/intranet/index.html">Intranet Home</a>
-  <a href="/">Public Site</a>
+  <a href="/" class="nav-logo">Fun2Phish</a>
+  <div class="nav-links" style="display:flex; align-items:center; gap:0.5rem;">
+    <a href="/intranet/index.html">Intranet</a>
+    <a href="/intranet/timeoff.html" style="color:var(--accent)">Time Off</a>
+    <a href="/intranet/approve.html">Approve</a>
+    <a href="/">Public Site</a>
+    <button class="logout-btn" onclick="logout()">Sign Out</button>
+  </div>
 </nav>
 
-<hr>
+<div class="page">
+  <div class="container">
 
-<form id="timeoffForm">
+    <div class="page-header fade-up">
+      <p class="section-label">🔒 Secured Area</p>
+      <h1>Request Time Off</h1>
+      <p>Fill out the form below and your request will be sent for review.</p>
+    </div>
 
-<label>Email</label>
-<input name="employeeEmail" type="email" required>
+    <div class="contact-form fade-up delay-1">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startDate">Start Date</label>
+          <input type="date" id="startDate" name="startDate" required>
+        </div>
+        <div class="form-group">
+          <label for="endDate">End Date</label>
+          <input type="date" id="endDate" name="endDate" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="employeeEmail">Your Email</label>
+        <input type="email" id="employeeEmail" name="employeeEmail" placeholder="you@fun2phish.com" required>
+      </div>
+      <div class="form-group">
+        <label for="reason">Reason</label>
+        <textarea id="reason" name="reason" placeholder="Brief reason for your request..." required></textarea>
+      </div>
+      <button onclick="submitRequest()">Submit Request →</button>
+      <div class="status-ok" id="statusOk">✓ Request submitted successfully!</div>
+      <div class="status-err" id="statusErr" id="statusErr"></div>
+    </div>
 
-<label>Start Date</label>
-<input name="startDate" type="date" required>
+  </div>
 
-<label>End Date</label>
-<input name="endDate" type="date" required>
-
-<label>Reason</label>
-<textarea name="reason" required></textarea>
-
-<button type="submit">Submit</button>
-
-</form>
-
-<p id="status"></p>
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-brand">⟁ Fun2Phish Intranet</span>
+      <span class="footer-text">Restricted — Authorized Personnel Only</span>
+    </div>
+  </footer>
+</div>
 
 <script>
-document.getElementById("timeoffForm").addEventListener("submit", async e => {
-  e.preventDefault();
+async function submitRequest() {
+  const data = {
+    employeeEmail: document.getElementById('employeeEmail').value,
+    startDate: document.getElementById('startDate').value,
+    endDate: document.getElementById('endDate').value,
+    reason: document.getElementById('reason').value,
+  };
+  const ok = document.getElementById('statusOk');
+  const err = document.getElementById('statusErr');
+  ok.style.display = 'none';
+  err.style.display = 'none';
 
-  const data = Object.fromEntries(new FormData(e.target));
-
-  const res = await fetch("/api/timeoff/submit", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify(data)
-  });
-
-  document.getElementById("status").innerText = await res.text();
-});
+  try {
+    const res = await fetch('/api/timeoff/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const text = await res.text();
+    if (res.ok) {
+      ok.style.display = 'block';
+    } else {
+      err.textContent = text || 'Something went wrong.';
+      err.style.display = 'block';
+    }
+  } catch (e) {
+    err.textContent = 'Could not reach the server.';
+    err.style.display = 'block';
+  }
+}
 </script>
-
-</div>
 
 </body>
 </html>

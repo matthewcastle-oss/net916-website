@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Login — Fun2Phish</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .login-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top, var(--accent-glow), transparent 70%);
+      pointer-events: none;
+    }
+    .login-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+    .login-box h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .login-box p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+    .login-box .form-group {
+      margin-bottom: 1.25rem;
+    }
+    .login-box label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+    .login-box input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .login-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+    }
+    .login-box button {
+      width: 100%;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+    .error-msg {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: #f43f5e;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      margin-bottom: 1.25rem;
+      display: none;
+    }
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="login-box fade-up">
+    <span class="login-icon">⟁</span>
+    <h1>Employee Login</h1>
+    <p>Restricted area. Authorized personnel only.</p>
+
+    <div class="error-msg" id="errorMsg">Incorrect username or password.</div>
+
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter your username" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+    </div>
+
+    <button onclick="attemptLogin()">Sign In →</button>
+    <a href="/" class="back-link">← Back to public site</a>
+  </div>
+</div>
+
+<script>
+  // Redirect if already logged in
+  if (sessionStorage.getItem('f2p_auth') === 'true') {
+    window.location.href = '/intranet/index.html';
+  }
+
+  // Credentials — change these to whatever you want
+  const USERS = {
+    'matt':   'H@wk3y3!',
+    'lucas':  'H@wk3y3!',
+    'ismael': 'H@wk3y3!',
+    'brent':  'H@wk3y3!',
+    'admin':  'H@wk3y3!'
+  };
+
+  function attemptLogin() {
+    const username = document.getElementById('username').value.trim().toLowerCase();
+    const password = document.getElementById('password').value;
+    const errorMsg = document.getElementById('errorMsg');
+
+    if (USERS[username] && USERS[username] === password) {
+      sessionStorage.setItem('f2p_auth', 'true');
+      sessionStorage.setItem('f2p_user', username);
+      window.location.href = '/intranet/index.html';
+    } else {
+      errorMsg.style.display = 'block';
+      document.getElementById('password').value = '';
+    }
+  }
+
+  // Allow pressing Enter to submit
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') attemptLogin();
+  });
+</script>
+
+</body>
+</html>

@@ -1,27 +1,151 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Intranet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intranet — Fun2Phish</title>
   <link rel="stylesheet" href="../style.css">
+  <style>
+    .intranet-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .intranet-nav .nav-links-left {
+      display: flex;
+      gap: 0.25rem;
+    }
+    .user-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent-glow);
+      border: 1px solid rgba(56,189,248,0.25);
+      border-radius: 100px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .intranet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .intranet-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .intranet-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top, var(--accent-glow), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .intranet-card:hover {
+      border-color: rgba(56,189,248,0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .intranet-card:hover::before { opacity: 1; }
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    .intranet-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+      position: relative;
+      z-index: 1;
+    }
+    .intranet-card p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      position: relative;
+      z-index: 1;
+    }
+    .logout-btn {
+      background: transparent;
+      border: 1px solid rgba(244,63,94,0.3);
+      color: #f43f5e;
+      font-size: 0.8rem;
+      padding: 0.4rem 1rem;
+      box-shadow: none;
+    }
+    .logout-btn:hover {
+      background: rgba(244,63,94,0.1);
+      box-shadow: none;
+      transform: none;
+    }
+  </style>
 </head>
 <body>
+<script src="/intranet/auth.js"></script>
 
-<div class="container">
-
-<h1>Employee Intranet</h1>
-
-<nav>
-  <a href="/">Public Site</a>
-  <a href="/intranet/timeoff.html">Request Time Off</a>
-  <a href="/intranet/approve.html">Approve Requests</a>
+<nav class="intranet-nav">
+  <a href="/" class="nav-logo">Fun2Phish</a>
+  <div class="nav-links" style="display:flex; align-items:center; gap:0.5rem;">
+    <a href="/intranet/index.html" style="color:var(--accent)">Intranet</a>
+    <a href="/intranet/timeoff.html">Time Off</a>
+    <a href="/intranet/approve.html">Approve</a>
+    <a href="/">Public Site</a>
+    <span class="user-chip" id="userChip">● Employee</span>
+    <button class="logout-btn" onclick="logout()">Sign Out</button>
+  </div>
 </nav>
 
-<hr>
+<div class="page">
+  <div class="container">
 
-<p>This area is secured and requires login.</p>
+    <div class="page-header fade-up">
+      <p class="section-label">🔒 Secured Area</p>
+      <h1>Employee Intranet</h1>
+      <p>Welcome back. Access your tools and manage requests below.</p>
+    </div>
 
+    <div class="intranet-grid">
+      <a href="/intranet/timeoff.html" class="intranet-card fade-up delay-1">
+        <div class="card-icon">📅</div>
+        <h3>Request Time Off</h3>
+        <p>Submit a time off request with your dates and reason for review.</p>
+      </a>
+      <a href="/intranet/approve.html" class="intranet-card fade-up delay-2">
+        <div class="card-icon">✅</div>
+        <h3>Approve Requests</h3>
+        <p>Review and approve or deny pending employee time off requests.</p>
+      </a>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-brand">⟁ Fun2Phish Intranet</span>
+      <span class="footer-text">Restricted — Authorized Personnel Only</span>
+    </div>
+  </footer>
 </div>
+
+<script>
+  const user = sessionStorage.getItem('f2p_user') || 'employee';
+  document.getElementById('userChip').textContent = '● ' + user.charAt(0).toUpperCase() + user.slice(1);
+</script>
 
 </body>
 </html>
