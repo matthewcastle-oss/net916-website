@@ -1,8 +1,25 @@
 {
   "routes": [
     {
+      "route": "/intranet/login.html",
+      "allowedRoles": [
+        "anonymous",
+        "authenticated"
+      ]
+    },
+    {
+      "route": "/intranet/auth.js",
+      "allowedRoles": [
+        "anonymous",
+        "authenticated"
+      ]
+    },
+    {
       "route": "/intranet/*",
-      "allowedRoles": ["authenticated"]
+      "allowedRoles": [
+        "anonymous",
+        "authenticated"
+      ]
     }
   ]
 }
