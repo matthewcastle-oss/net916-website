@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Dashboard — Fun2Phish</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #ddd; font-size: 14px; }
+        th { background: #f5f5f5; font-weight: 600; }
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+        .badge-open { background: #fff3cd; color: #856404; }
+        .badge-in-progress { background: #cfe2ff; color: #084298; }
+        .badge-resolved { background: #d1e7dd; color: #0a3622; }
+        .badge-high { background: #f8d7da; color: #842029; }
+        .badge-medium { background: #fff3cd; color: #856404; }
+        .badge-low { background: #d1e7dd; color: #0a3622; }
+        select { font-size: 13px; padding: 4px 6px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ticket Dashboard</h1>
+        <p>Manage incoming IT support requests.</p>
+    </header>
+
+    <main>
+        <div id="stats" style="display:flex; gap:1rem; margin-bottom:1.5rem;">
+            <div class="stat-card"><span id="count-open">-</span><small>Open</small></div>
+            <div class="stat-card"><span id="count-inprogress">-</span><small>In progress</small></div>
+            <div class="stat-card"><span id="count-resolved">-</span><small>Resolved</small></div>
+        </div>
+
+        <table id="ticket-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Issue</th>
+                    <th>Priority</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="ticket-body">
+                <tr><td colspan="6">Loading...</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        async function loadTickets() {
+            const res = await fetch("/api/getTickets");
+            const tickets = await res.json();
+
+            const open = tickets.filter(t => t.status === "open").length;
+            const inprogress = tickets.filter(t => t.status === "in-progress").length;
+            const resolved = tickets.filter(t => t.status === "resolved").length;
+
+            document.getElementById("count-open").textContent = open;
+            document.getElementById("count-inprogress").textContent = inprogress;
+            document.getElementById("count-resolved").textContent = resolved;
+
+            document.getElementById("ticket-body").innerHTML = tickets.map(t => `
+                <tr>
+                    <td>${t.id}</td>
+                    <td>${t.name}</td>
+                    <td>${t.issue}</td>
+                    <td><span class="badge badge-${t.priority}">${t.priority}</span></td>
+                    <td>${new Date(t.submittedAt).toLocaleDateString()}</td>
+                    <td>
+                        <select onchange="updateStatus(${t.id}, this.value)">
+                            <option value="open" ${t.status==='open'?'selected':''}>Open</option>
+                            <option value="in-progress" ${t.status==='in-progress'?'selected':''}>In progress</option>
+                            <option value="resolved" ${t.status==='resolved'?'selected':''}>Resolved</option>
+                        </select>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        async function updateStatus(id, status) {
+            await fetch("/api/updateTicket", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id, status })
+            });
+            loadTickets();
+        }
+
+        loadTickets();
+    </script>
+</body>
+</html>
