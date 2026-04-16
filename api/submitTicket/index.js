@@ -1,4 +1,5 @@
 const sql = require("mssql");
+const sgMail = require("@sendgrid/mail");
 
 module.exports = async function (context, req) {
     try {
@@ -15,14 +16,36 @@ module.exports = async function (context, req) {
         }
 
         const connStr = process.env.SQL_CONNECTION_STRING;
+        const sendgridKey = process.env.SENDGRID_API_KEY;
+        const mailFrom = process.env.MAIL_FROM;
+
         if (!connStr) throw new Error("Missing SQL_CONNECTION_STRING env var");
+        if (!sendgridKey) throw new Error("Missing SENDGRID_API_KEY env var");
+        if (!mailFrom) throw new Error("Missing MAIL_FROM env var");
 
+        // Save ticket to SQL
         await sql.connect(connStr);
-
         await sql.query`
             INSERT INTO tickets (name, issue, priority, status, submittedAt)
             VALUES (${name}, ${issue}, ${priority}, 'open', GETDATE())
         `;
+
+        // Send email notification
+        sgMail.setApiKey(sendgridKey);
+        await sgMail.send({
+            to: "mcastle@fun2phish.tech",
+            from: mailFrom,
+            subject: `New helpdesk ticket — ${priority} priority`,
+            html: `
+                <h2>New IT Helpdesk Ticket</h2>
+                <p><strong>From:</strong> ${name}</p>
+                <p><strong>Priority:</strong> ${priority}</p>
+                <p><strong>Issue:</strong></p>
+                <p>${issue}</p>
+                <hr>
+                <p>View all tickets at <a href="https://www.fun2phish.tech/intranet/tickets.html">the dashboard</a>.</p>
+            `
+        });
 
         context.res = { status: 200, body: { message: "Ticket submitted successfully!" } };
 
