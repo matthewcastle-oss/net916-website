@@ -1,71 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT Helpdesk — Fun2Phish</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Helpdesk — Fun2Phish</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>IT Helpdesk</h1>
-        <p>Submit a support ticket and our team will get back to you.</p>
-    </header>
+<nav>
+  <a href="index.html" class="nav-logo">Fun2Phish</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="employees.html">Team</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="/intranet/index.html" class="intranet">Employee Intranet ↗</a>
+  </div>
+</nav>
 
-    <main>
-        <div id="success-msg" style="display:none; color:green; margin-bottom:1rem;">
-            Ticket submitted successfully!
+<div class="page">
+  <section class="container">
+    <div class="page-header">
+      <div class="hero-badge fade-up">Support</div>
+      <h1 class="fade-up delay-1">IT Helpdesk</h1>
+      <p class="fade-up delay-2">Submit a support ticket and our team will get back to you as soon as possible.</p>
+    </div>
+
+    <div class="contact-form fade-up delay-2">
+
+      <div id="success-msg" style="display:none; margin-bottom:1.5rem; padding:1rem 1.25rem; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); border-radius:8px; color:#10b981; font-size:0.9rem;">
+        Ticket submitted successfully! We'll be in touch soon.
+      </div>
+      <div id="error-msg" style="display:none; margin-bottom:1.5rem; padding:1rem 1.25rem; background:rgba(244,63,94,0.1); border:1px solid rgba(244,63,94,0.3); border-radius:8px; color:#f43f5e; font-size:0.9rem;">
+        Something went wrong. Please try again.
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Your name</label>
+          <input type="text" id="name" placeholder="John Smith" required />
         </div>
-        <div id="error-msg" style="display:none; color:red; margin-bottom:1rem;">
-            Something went wrong. Please try again.
+        <div class="form-group">
+          <label for="priority">Priority</label>
+          <select id="priority">
+            <option value="low">Low — general question</option>
+            <option value="medium">Medium — affecting my work</option>
+            <option value="high">High — urgent issue</option>
+          </select>
         </div>
+      </div>
 
-        <form id="ticket-form">
-            <label for="name">Your name</label>
-            <input type="text" id="name" required placeholder="John Smith" />
+      <div class="form-group">
+        <label for="issue">Describe your issue</label>
+        <textarea id="issue" placeholder="Please describe the problem in as much detail as possible..." required></textarea>
+      </div>
 
-            <label for="issue">Describe your issue</label>
-            <textarea id="issue" required rows="4" 
-                placeholder="e.g. I can't log into my account"></textarea>
+      <button id="submit-btn" onclick="submitTicket()">
+        Submit ticket →
+      </button>
 
-            <label for="priority">Priority</label>
-            <select id="priority">
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-            </select>
+    </div>
+  </section>
 
-            <button type="submit">Submit ticket</button>
-        </form>
-    </main>
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-brand">⟁ Fun2Phish</span>
+      <span class="footer-text">© 2025 Fun2Phish. All rights reserved.</span>
+    </div>
+  </footer>
+</div>
 
-    <script>
-        document.getElementById("ticket-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
+<script>
+  async function submitTicket() {
+    const btn = document.getElementById("submit-btn");
+    const name = document.getElementById("name").value.trim();
+    const issue = document.getElementById("issue").value.trim();
+    const priority = document.getElementById("priority").value;
+    const successMsg = document.getElementById("success-msg");
+    const errorMsg = document.getElementById("error-msg");
 
-            const name = document.getElementById("name").value;
-            const issue = document.getElementById("issue").value;
-            const priority = document.getElementById("priority").value;
+    successMsg.style.display = "none";
+    errorMsg.style.display = "none";
 
-            try {
-                const res = await fetch("/api/submitTicket", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ name, issue, priority })
-                });
+    if (!name || !issue) {
+      errorMsg.textContent = "Please fill in all fields before submitting.";
+      errorMsg.style.display = "block";
+      return;
+    }
 
-                if (res.ok) {
-                    document.getElementById("success-msg").style.display = "block";
-                    document.getElementById("error-msg").style.display = "none";
-                    document.getElementById("ticket-form").reset();
-                } else {
-                    throw new Error();
-                }
-            } catch {
-                document.getElementById("error-msg").style.display = "block";
-                document.getElementById("success-msg").style.display = "none";
-            }
-        });
-    </script>
+    btn.textContent = "Submitting...";
+    btn.disabled = true;
+
+    try {
+      const res = await fetch("/api/submitTicket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, issue, priority })
+      });
+
+      if (res.ok) {
+        successMsg.style.display = "block";
+        document.getElementById("name").value = "";
+        document.getElementById("issue").value = "";
+        document.getElementById("priority").value = "low";
+        btn.textContent = "Submit ticket →";
+        btn.disabled = false;
+      } else {
+        throw new Error();
+      }
+    } catch {
+      errorMsg.textContent = "Something went wrong. Please try again.";
+      errorMsg.style.display = "block";
+      btn.textContent = "Submit ticket →";
+      btn.disabled = false;
+    }
+  }
+</script>
 </body>
 </html>
