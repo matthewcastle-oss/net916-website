@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Helpdesk — Fun2Phish</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>IT Helpdesk</h1>
+        <p>Submit a support ticket and our team will get back to you.</p>
+    </header>
+
+    <main>
+        <div id="success-msg" style="display:none; color:green; margin-bottom:1rem;">
+            Ticket submitted successfully!
+        </div>
+        <div id="error-msg" style="display:none; color:red; margin-bottom:1rem;">
+            Something went wrong. Please try again.
+        </div>
+
+        <form id="ticket-form">
+            <label for="name">Your name</label>
+            <input type="text" id="name" required placeholder="John Smith" />
+
+            <label for="issue">Describe your issue</label>
+            <textarea id="issue" required rows="4" 
+                placeholder="e.g. I can't log into my account"></textarea>
+
+            <label for="priority">Priority</label>
+            <select id="priority">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+
+            <button type="submit">Submit ticket</button>
+        </form>
+    </main>
+
+    <script>
+        document.getElementById("ticket-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const issue = document.getElementById("issue").value;
+            const priority = document.getElementById("priority").value;
+
+            try {
+                const res = await fetch("/api/submitTicket", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, issue, priority })
+                });
+
+                if (res.ok) {
+                    document.getElementById("success-msg").style.display = "block";
+                    document.getElementById("error-msg").style.display = "none";
+                    document.getElementById("ticket-form").reset();
+                } else {
+                    throw new Error();
+                }
+            } catch {
+                document.getElementById("error-msg").style.display = "block";
+                document.getElementById("success-msg").style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>
